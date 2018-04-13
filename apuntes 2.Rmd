@@ -5,32 +5,29 @@
 
 ### Probabilidad
 
-Es un número (función) que mide la factibilidad o posibilidad de la ocurrencia de un evento. El *Dominio* son los Eventos; el *Recorrido* es [0-1]
+Es una función (que entrega un número) que mide la factibilidad o posibilidad de la ocurrencia de un evento. El *Dominio* son los Eventos; el *Codominio* es el intervalo [0-1].
 
 
-Se plantea un universo con dos perspectivas: **determinismo** vs **aleatoridad**.
+Se plantea un universo con dos perspectivas: **determinismo** vs **aleatoridad**. Que un fenómeno sea determinista o aleatorio depende de cómo se modela, no es una propiedad intrínseca a este.
 
-Que un fenómeno sea determinista o aleatorio depende de cómo se modela, no es una propiedad intrínseca a este.
-
-*Determinismo* es, por ejemplo, la ecuacion de la posición de un cuerpo sometido a la gravedad según el tiempo. Se pueden agregar variables a esta ecuación: el *roce*; *variables no perfectamente cuantificadas (error)*; variables que *no puedo observar*. 
+*Determinismo* es, por ejemplo, la ecuacion de la posición de un cuerpo sometido a la gravedad según el tiempo. Se pueden agregar variables a esta ecuación: el roce; variables no perfectamente cuantificadas; variables que no puedo observar. 
 
 Otra forma de ver el problema es asumir que no podré conocer todas las variables que determinan el problema, pero sí se puede modelar el resultado posible de la ocurrencia del evento.
 
 En esa perspectiva de formulación del problema está el concepto de **variable aleatoria**, que hace referencia al *experimento* y *lo que observamos* al realizarlo.
 
----
-
+***
 
 ### Ejemplo de la moneda al aire
 
+Evento: Lanzamiento de la moneda, es el experimento.
 
-Resultados posibles:
-
-+ *Cara*, 
-+ *Sello*, lo que *observo*
+Resultados posibles: *Cara*, *Sello*, lo que observo.
 
 
-Evento: Lanzamiento de la moneda <- es el experimento
+Por lo que la función se define: La función variable aleatoria es una función desde el *evento* (que ocurre en el espacio muestral) a los reales (resultados posibles, codificados como el par 0,1) 
+
+**<sub>va</sub>X : &Omega; &rarr; &#8477;**
 
 **<sub>va</sub>X : &Omega; (espacio muestral) &rarr; &#8477; Resultado [0,1]**
 
