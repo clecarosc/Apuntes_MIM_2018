@@ -1,0 +1,128 @@
+---
+title: "clase 2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Estadística Básica
+
+### Probabilidad
+
+Es un número (función) que mide la factibilidad o posibilidad de la ocurrencia de un evento. El Dominio son los Eventos; el Recorrido es [0-1]
+Se plantea un universo con dos perspectivas: **determinismo** vs **aleatoridad**.
+Determinismo es por ej la ecuacion de la posición de un cuerpo sometido a la gravedad. Si se agrega el roce, esto agrega variables que *no puedo observar*. Se agrega además **variables no perfectamente cuantificadas (error)**. 
+Que un fenómeno sea determinista o aleatorio depende de cómo se modela, no es una propiedad intrínseca a este.
+
+Escondido está el concepto de **variable aleatoria** que hace referencia al experimento y lo que observamos al realizarlo.
+
+---
+
+
+### Ejemplo de la moneda al aire
+* Resultados posibles: Cara, Sello <- lo que observo
+* Evento: Lanzamiento de la moneda <- es el experimento
+LATEX $ ~va~X : Omega (espacio muestral) -> Resultado (R de reales) [0,1] $
+X(w) E R
+X(w= lanzamiento) es el resultado
+P(Omega)=1
+
+***
+###2
+Hay algo diferente con cómo se comprende usualmente función en probabilidades. no se determina un unico valor, sino que se tiene un sistema completo.
+
+No tenemos una fórmula que dado un lanzamiento nos indique deterministicamente si será cara o sello.
+LATEX P(X=0) ó P(X=1)
+P(X=0) significa w E Omega tal que "x(w)=0"
+P(X=1) significa w E Omega tal que "x(w)=1"
+
+Cuál es la probabilidad de que sea cara o sello? 1
+
+
+***
+El espacio muestral une los resultados individuales
+El conjunto vacio se articula como las posibilidad nula de ocurrencia 
+*eg  X=2*
+
+***
+###3
+Un paciente, que se enferma o no
+
+~va~X : Omega (espacio muestral) -> Resultado (R de reales) [0,1] $
+a modo de funcion X(w) w= individuo, por ej
+      R , sano o enfermo
+$$P(X=0)$$ significa w E Omega tal que "x(w)=0" 1-prevalencia (sanos)
+P(X=1) significa w E-pertenece Omega tal que "x(w)=1", la probabilidad que lo tenga, es la **prevalencia** en la poblacion
+
+Otros ejemplos: el med funciona o no, el sistema colapsa o no, se enferma grave o leve, etc... 
+
+
+***      
+### 4
+
+Cuando X variable aleatoria tiene cierta utilidad, 
+Bernoulli con parametro prev correspondiente 0,1
+prev(0,1)
+
+***
+### Distribución geométrica
+ver apunte
+dos eventos:  enfermo, sano A^c^
+X es el numero en ocurre que paciente este sano
+cuantas veces llego una persona sana antes que una enferma
+p es que este enfermo y es constante, y los eventos son independientes
+**Esperanza** viene a darme un valor que conociendo p, me entrega un simil a la media
+
+***
+### Binomial
+
+ver apunte
+saiani
+con imagenes se muestra como se inclina segun cambia p .5
+como la binomial se aproxima a una normal y tb como
+
+***
+### Poisson
+ver apunte
+el parametro es lambda
+se ocupa cuando se evalua un evento poco frecuente
+ej. aparicion de ram a medicamentos
+reemplaza a la binomial cuando lambda es chico y N es grande
+sigue siendo discreta
+
+***
+### Multinomial
+es la generalizacion de la binomal
+en vez de contar lado cara, o en vez de enfermos, hay mas de 2 opciones
+egs:  en vez de la moneda, el lado de un dado, enfermedad leve moderado y grave
+- cada individuo tiene mas de 2 opciones, pero finita respecto a la condicion observada.
+Probabilidad de que  N=100 individuos se observe 8 sanos
+
+Se anota así
+X como un vector X=(X~sanos~, X~leve~, X~moderado~, X~grave~),
+se le conoce vector aleatorio.
+Queremos calcular $P(X=(20,30,41,9))$
+realistamente, no tiene tanto sentido calcular la configuracion especifica de los sujetos, sino extenderlo hacia lo continuo (p ej, conocer probabildiades de rangos de altura, no alturas especificas)
+
+tengo 5 pacientes y observo que el numero de sanos = graves
+P(n sanos = n graves)
+0, comb, 0
+1, comb, 1
+
+***
+###Normal
+estandarizar a Z
+solo se determinan rangos, no valores exactos (no se define)
+
+X~ N (170,1)
+como calculo la probalidad de que un chileno mida 171 o mas
+estandarizar
+el punto donde cambia la convexidad de la campana determina un sigma
+con la normal se modela lo que ocurre por azar
+
+
+***
+### Otras notas
+*Centro de regulación del genoma. Grupo interUes, averiguar.*
