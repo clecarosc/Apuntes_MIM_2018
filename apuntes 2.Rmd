@@ -5,25 +5,41 @@
 
 ### Probabilidad
 
-Es un número (función) que mide la factibilidad o posibilidad de la ocurrencia de un evento. El Dominio son los Eventos; el Recorrido es [0-1]
+Es un número (función) que mide la factibilidad o posibilidad de la ocurrencia de un evento. El *Dominio* son los Eventos; el *Recorrido* es [0-1]
 
 
 Se plantea un universo con dos perspectivas: **determinismo** vs **aleatoridad**.
-Determinismo es por ej la ecuacion de la posición de un cuerpo sometido a la gravedad. Si se agrega el roce, esto agrega variables que *no puedo observar*. Se agrega además **variables no perfectamente cuantificadas (error)**. 
+
 Que un fenómeno sea determinista o aleatorio depende de cómo se modela, no es una propiedad intrínseca a este.
 
-Escondido está el concepto de **variable aleatoria** que hace referencia al experimento y lo que observamos al realizarlo.
+*Determinismo* es, por ejemplo, la ecuacion de la posición de un cuerpo sometido a la gravedad según el tiempo. Se pueden agregar variables a esta ecuación: el *roce*; *variables no perfectamente cuantificadas (error)*; variables que *no puedo observar*. 
+
+Otra forma de ver el problema es asumir que no podré conocer todas las variables que determinan el problema, pero sí se puede modelar el resultado posible de la ocurrencia del evento.
+
+En esa perspectiva de formulación del problema está el concepto de **variable aleatoria**, que hace referencia al *experimento* y *lo que observamos* al realizarlo.
 
 ---
 
 
 ### Ejemplo de la moneda al aire
-* Resultados posibles: Cara, Sello <- lo que observo
-* Evento: Lanzamiento de la moneda <- es el experimento
-LATEX $ ~va~X : Omega (espacio muestral) -> Resultado (R de reales) [0,1] $
-X(w) E R
-X(w= lanzamiento) es el resultado
-P(Omega)=1
+
+
+Resultados posibles:
+
++ *Cara*, 
++ *Sello*, lo que *observo*
+
+
+Evento: Lanzamiento de la moneda <- es el experimento
+
+**<sub>va</sub>X : &Omega; (espacio muestral) &rarr; &#8477; Resultado [0,1]**
+
+
+X(&omega;) &isin;  &#8477;
+X(&omega;= lanzamiento) es el resultado
+
+
+&#8473; ( &Omega; )=  1
 
 ***
 ### 2
@@ -31,7 +47,7 @@ Hay algo diferente con cómo se comprende usualmente función en probabilidades.
 
 No tenemos una fórmula que dado un lanzamiento nos indique deterministicamente si será cara o sello.
 LATEX P(X=0) ó P(X=1)
-P(X=0) significa w E &Omega; tal que "x(&omega;)=0"
+&‌#8473;(X=0) significa w E &Omega; tal que "x(&omega;)=0"
 P(X=1) significa w E &Omega; tal que "x(w)=1"
 
 Cuál es la probabilidad de que sea cara o sello? 1
