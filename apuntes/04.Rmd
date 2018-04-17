@@ -1,0 +1,173 @@
+---
+title: "Límites, Derivadas e Integrales usando Lenguaje simbólico en R"
+output:
+  pdf_document:
+    fig_height: 5
+    fig_width: 5
+---
+### `Ryacas` 
+El siguiente apunte es un resumen de la clase del sábado 14 de abril. Lo que quise fue responder la pregunta: cómo puede implementarse lo conversado en `R`. 
+Como la materia es fundamentalmente teórica, se necesita un lenguaje de programación que pueda operar matemáticas de manera simbólica.  
+En `R`, se me ocurren tres formas de hacer esto. La primera es llamando desde `R` al lenguaje `yacas`, que es la forma como lo haré. La segunda es llamando a una libreria de `Python` hacia `R` conocida como SymPy. La tercera es llamando a alguna libreria de `matlab`.  
+Para usar `yacas` desde `R` se necesita el paquete `Ryacas`. Por lo tanto, lo primero es instalar y llamarlo.  
+```{r llamar Ryacas}
+library(Ryacas)
+```
+
+Ryacas necesita a su vez de un paquete llamado `XML` que al parecer está en desuso, por lo que las nuevas versiones de `R` (desde 3.4.1) arrojan un mensaje de advertencia incómodo cuando lo usamos. Para cancelar de manera momentanea las advertencias, cambiamos la opción del Global Enviroment.
+```{r guardar nivel de advertencias}
+options(warn = -1)
+```
+
+***
+## Desafío 1.
+Demuestre que:  
+$\displaystyle \lim_{x\to2} \frac {x^2+5}{x-3} = -9$  
+  
+
+```{r}
+x <- Sym("x") #definimos x simbolicamente
+
+```
+Luego, sabemos que límite de una suma es la suma de los límites, que el límite de una constante es la constante y que el límite de una multiplicación es la multiplicación de los límites y entonces:
+
+```{r}
+Limit(x^2,x,2)
+Limit(5,x,2)
+Limit(x,x,2)
+Limit(-3,x,2)
+Limit(x^2,x,2)+Limit(5,x,2)
+Limit(x,x,2)-(Limit(3,x,2))
+(Limit(x^2,x,2)+Limit(5,x,2))/(Limit(x,x,2)-(Limit(3,x,2)))
+```
+
+***
+
+## Desafío 2. 
+Grafique y calcule las asintotas de la función  $\displaystyle f(x)= \frac{9x^2}{x^2+3}$  
+
+### Parte I. Graficar  
+
+
+Para graficar, voy a ocupar el paquete `base::graphics` que viene instalado por default y no es necesario llamar.
+El código sería:  
+
+```{r Grafico funcion}
+curve(9*x^2/(x^2+3), from = -20, to = 20, col = "blue",
+      ylab = "f(x)", bty = "L", yaxs = "i")
+abline(v = 0) #grafica la funcion
+
+```
+
+### Parte 2. Calcule las asíntontas
+
+Lo que demostró este ejercicio es que se necesita la regla de L'Hopital para poder determinar el límite
+
+$$\lim_{x\to\infty} \frac {f(x)}{g(x)} = \lim_{x\to\infty} \frac {f^\prime(x)}{g^\prime(x)}$$
+
+El código que se necesita para computar el límite en R, usando yacas es:
+
+```{r}
+
+Limit((9*x^2)/(x^2+3), x, Infinity) #calculamos el limite
+
+```
+
+Se puede calcular usando L`Hopital:
+
+```{r}
+
+deriv1 <- deriv((9*x^2),x); deriv1 #derivadas
+deriv2 <- deriv((x^2+3), x); deriv2 
+deriv <- Simplify(deriv1/deriv2); deriv #simplificamos
+
+asintota <- yacas(Limit((9*x^2)/(x^2+3), x, Infinity), retclass = "character") 
+#rescatamos el valor
+asintota <- as.numeric(asintota[[1]])
+```
+
+El límite de las asintotas es 9.
+Podemos graficarlo:
+
+```{r}
+
+curve(9*x^2/(x^2+3), from =  -20, to = 20, ylab = "f(x)", col = "blue",
+      bty = "L", las = 1, yaxs = "i", ylim = c(0,10))
+abline(v = 0)
+abline(h = asintota, col="green", lty=2) #limite de las asintotas
+```
+
+
+***
+
+## Desafío 3.  
+Grafique y calcule la derivada de la función $\displaystyle f(x)= \frac{9x^2}{x^2+3}$.
+
+Para calcular la derivada se necesita saber que la derivada de un cuociente se puede desarrollar como: 
+$$\displaystyle f(x)={\frac {g(x)}{h(x)}}$$,
+$$\displaystyle {\frac {d}{dx}}f(x)=f'(x)={\frac {g'(x)h(x)-g(x)h'(x)}{{h(x)}^{2}}}$$
+
+
+### Parte 1. Cálculo  
+
+```{r}
+derivada <- deriv(9*x^2/(x^2+3),x); derivada
+simple <-Simplify(derivada); simple
+
+```
+
+La derivada es $\displaystyle \frac{(x^2 + 3) * (18 * x) - 9 * (x^2 * (2 * x))}{(x^2+3)^2} =   \displaystyle \frac{54 * x}{x^4 + 6 * x^2 + 9}$
+
+### Parte 2. Gráfico
+```{r}
+plot( x = -10:10, y = -10:10, ylim = c(-5,10),
+      type = "n", ylab = "y", xlab = "x",
+      axes = FALSE)
+box()
+axis(1, pos=0, las = 1)
+axis(2, pos=0, las = 1)
+curve((9*x^2/(x^2+3)), 
+      col = "blue",
+      add = TRUE)
+abline(h = asintota, col="green", lty=2)
+curve((54 * x/(x^4 + 6 * x^2 + 9)),
+      col = "red",
+      add = TRUE)
+
+```
+
+## Desafío 4.
+
+Calcule $\displaystyle \int_0^1x^2dx$
+
+```{r}
+Integrate(x^2,x,0,1)
+```
+Esta integral puede ser calculada también directamente en `R` con la función `integrate`. 
+El gráfico que representa el área calculada es:
+
+```{r}
+curve(x^2, 
+      ylim = c(0,2), yaxs ="i",
+      xlim = c(-1.5,1.5), xaxs = "i",
+      bty = "L")
+fun <- curve(x^2, from = 0, to = 1, add = T, col = "red")
+polygon(x = c(fun$x, 1),
+        y = c(fun$y, 0),
+        density = 15,
+        col = "red")
+```
+
+
+### Comentarios
+
+* `yacmode()` es una forma de ocupar yacas directamente en la consola.  
+* Una buena explicación de cómo ocupar la función `polygon` [aqui](https://stackoverflow.com/questions/37472365/how-to-use-polygon-to-shade-below-a-probability-density-curve)  
+
+* Para volver el nivel de advertencias al default
+```{r}
+options(warn = 0)
+```
+  
+  
+  **Cristóbal Lecaros C.**
