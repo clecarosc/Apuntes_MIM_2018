@@ -4,7 +4,7 @@
 
 
 
-[Matemáticas para Bioestadística](https://github.com/clecarosc/Apuntes_MIM_2018/CBMB/)
+[Matemáticas para Bioestadística](https://github.com/clecarosc/Apuntes_MIM_2018/tree/master/CBMB)
 
 Computación I y II
 
