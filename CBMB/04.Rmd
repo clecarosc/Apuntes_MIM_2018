@@ -1,9 +1,8 @@
 ---
 title: "Límites, Derivadas e Integrales usando Lenguaje simbólico en R"
 output:
-  pdf_document:
-    fig_height: 5
-    fig_width: 5
+  html_document: default
+  
 ---
 ### `Ryacas` 
 El siguiente apunte es un resumen de la clase del sábado 14 de abril. Lo que quise fue responder la pregunta: cómo puede implementarse lo conversado en `R`. 
@@ -161,7 +160,7 @@ polygon(x = c(fun$x, 1),
 
 ### Comentarios
 
-* `yacmode()` es una forma de ocupar yacas directamente en la consola.  
+* `yacmode()` es una forma de ocupar yacas directamente en la consola.
 * Una buena explicación de cómo ocupar la función `polygon` [aqui](https://stackoverflow.com/questions/37472365/how-to-use-polygon-to-shade-below-a-probability-density-curve)  
 
 * Para volver el nivel de advertencias al default
