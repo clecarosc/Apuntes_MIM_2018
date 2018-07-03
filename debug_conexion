@@ -1,0 +1,220 @@
+Last login: Mon Jul  2 20:37:03 on ttys000
+clc:~ clecarosc$ ssh -vvv -R 53012:localhost:53012 clecaros@172.27.25.27
+OpenSSH_7.6p1, LibreSSL 2.6.2
+debug1: Reading configuration data /Users/clecarosc/.ssh/config
+debug1: /Users/clecarosc/.ssh/config line 1: Applying options for 172.27.25.27
+debug1: Reading configuration data /etc/ssh/ssh_config
+debug1: /etc/ssh/ssh_config line 48: Applying options for *
+debug1: /etc/ssh/ssh_config line 52: Applying options for *
+debug2: ssh_connect_direct: needpriv 0
+debug1: Connecting to 172.27.25.27 port 22.
+debug1: Connection established.
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_rsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_rsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_dsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_dsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_ecdsa type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_ecdsa-cert type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_ed25519 type -1
+debug1: key_load_public: No such file or directory
+debug1: identity file /Users/clecarosc/.ssh/id_ed25519-cert type -1
+debug1: Local version string SSH-2.0-OpenSSH_7.6
+debug1: Remote protocol version 2.0, remote software version OpenSSH_6.7p1 Debian-5+deb8u4
+debug1: match: OpenSSH_6.7p1 Debian-5+deb8u4 pat OpenSSH* compat 0x04000000
+debug3: fd 5 is O_NONBLOCK
+debug1: Authenticating to 172.27.25.27:22 as 'clecaros'
+debug3: hostkeys_foreach: reading file "/Users/clecarosc/.ssh/known_hosts"
+debug3: record_hostkey: found key type ECDSA in file /Users/clecarosc/.ssh/known_hosts:1
+debug3: load_hostkeys: loaded 1 keys from 172.27.25.27
+debug3: order_hostkeyalgs: prefer hostkeyalgs: ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp521-cert-v01@openssh.com,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521
+debug3: send packet: type 20
+debug1: SSH2_MSG_KEXINIT sent
+debug3: receive packet: type 20
+debug1: SSH2_MSG_KEXINIT received
+debug2: local client KEXINIT proposal
+debug2: KEX algorithms: curve25519-sha256,curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512,diffie-hellman-group-exchange-sha1,diffie-hellman-group14-sha256,diffie-hellman-group14-sha1,ext-info-c
+debug2: host key algorithms: ecdsa-sha2-nistp256-cert-v01@openssh.com,ecdsa-sha2-nistp384-cert-v01@openssh.com,ecdsa-sha2-nistp521-cert-v01@openssh.com,ecdsa-sha2-nistp256,ecdsa-sha2-nistp384,ecdsa-sha2-nistp521,ssh-ed25519-cert-v01@openssh.com,ssh-rsa-cert-v01@openssh.com,ssh-ed25519,rsa-sha2-512,rsa-sha2-256,ssh-rsa
+debug2: ciphers ctos: chacha20-poly1305@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com
+debug2: ciphers stoc: chacha20-poly1305@openssh.com,aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1
+debug2: compression ctos: none,zlib@openssh.com,zlib
+debug2: compression stoc: none,zlib@openssh.com,zlib
+debug2: languages ctos: 
+debug2: languages stoc: 
+debug2: first_kex_follows 0 
+debug2: reserved 0 
+debug2: peer server KEXINIT proposal
+debug2: KEX algorithms: curve25519-sha256@libssh.org,ecdh-sha2-nistp256,ecdh-sha2-nistp384,ecdh-sha2-nistp521,diffie-hellman-group-exchange-sha256,diffie-hellman-group14-sha1
+debug2: host key algorithms: ssh-rsa,ssh-dss,ecdsa-sha2-nistp256,ssh-ed25519
+debug2: ciphers ctos: aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+debug2: ciphers stoc: aes128-ctr,aes192-ctr,aes256-ctr,aes128-gcm@openssh.com,aes256-gcm@openssh.com,chacha20-poly1305@openssh.com
+debug2: MACs ctos: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1
+debug2: MACs stoc: umac-64-etm@openssh.com,umac-128-etm@openssh.com,hmac-sha2-256-etm@openssh.com,hmac-sha2-512-etm@openssh.com,hmac-sha1-etm@openssh.com,umac-64@openssh.com,umac-128@openssh.com,hmac-sha2-256,hmac-sha2-512,hmac-sha1
+debug2: compression ctos: none,zlib@openssh.com
+debug2: compression stoc: none,zlib@openssh.com
+debug2: languages ctos: 
+debug2: languages stoc: 
+debug2: first_kex_follows 0 
+debug2: reserved 0 
+debug1: kex: algorithm: curve25519-sha256@libssh.org
+debug1: kex: host key algorithm: ecdsa-sha2-nistp256
+debug1: kex: server->client cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none
+debug1: kex: client->server cipher: chacha20-poly1305@openssh.com MAC: <implicit> compression: none
+debug3: send packet: type 30
+debug1: expecting SSH2_MSG_KEX_ECDH_REPLY
+debug3: receive packet: type 31
+debug1: Server host key: ecdsa-sha2-nistp256 SHA256:QMpVZagzvm8GD0yAwZvmoqFHnpgljFooRJ0CF7QKN/Y
+debug3: hostkeys_foreach: reading file "/Users/clecarosc/.ssh/known_hosts"
+debug3: record_hostkey: found key type ECDSA in file /Users/clecarosc/.ssh/known_hosts:1
+debug3: load_hostkeys: loaded 1 keys from 172.27.25.27
+debug1: Host '172.27.25.27' is known and matches the ECDSA host key.
+debug1: Found key in /Users/clecarosc/.ssh/known_hosts:1
+debug3: send packet: type 21
+debug2: set_newkeys: mode 1
+debug1: rekey after 134217728 blocks
+debug1: SSH2_MSG_NEWKEYS sent
+debug1: expecting SSH2_MSG_NEWKEYS
+debug3: receive packet: type 21
+debug1: SSH2_MSG_NEWKEYS received
+debug2: set_newkeys: mode 0
+debug1: rekey after 134217728 blocks
+debug2: key: /Users/clecarosc/.ssh/id_rsa (0x0)
+debug2: key: /Users/clecarosc/.ssh/id_dsa (0x0)
+debug2: key: /Users/clecarosc/.ssh/id_ecdsa (0x0)
+debug2: key: /Users/clecarosc/.ssh/id_ed25519 (0x0)
+debug3: send packet: type 5
+debug3: receive packet: type 6
+debug2: service_accept: ssh-userauth
+debug1: SSH2_MSG_SERVICE_ACCEPT received
+debug3: send packet: type 50
+debug3: receive packet: type 51
+debug1: Authentications that can continue: publickey,password
+debug3: start over, passed a different list publickey,password
+debug3: preferred publickey,keyboard-interactive,password
+debug3: authmethod_lookup publickey
+debug3: remaining preferred: keyboard-interactive,password
+debug3: authmethod_is_enabled publickey
+debug1: Next authentication method: publickey
+debug1: Trying private key: /Users/clecarosc/.ssh/id_rsa
+debug3: no such identity: /Users/clecarosc/.ssh/id_rsa: No such file or directory
+debug1: Trying private key: /Users/clecarosc/.ssh/id_dsa
+debug3: no such identity: /Users/clecarosc/.ssh/id_dsa: No such file or directory
+debug1: Trying private key: /Users/clecarosc/.ssh/id_ecdsa
+debug3: no such identity: /Users/clecarosc/.ssh/id_ecdsa: No such file or directory
+debug1: Trying private key: /Users/clecarosc/.ssh/id_ed25519
+debug3: no such identity: /Users/clecarosc/.ssh/id_ed25519: No such file or directory
+debug2: we did not send a packet, disable method
+debug3: authmethod_lookup password
+debug3: remaining preferred: ,password
+debug3: authmethod_is_enabled password
+debug1: Next authentication method: password
+clecaros@172.27.25.27's password: 
+debug3: send packet: type 50
+debug2: we sent a password packet, wait for reply
+debug3: receive packet: type 52
+debug1: Authentication succeeded (password).
+Authenticated to 172.27.25.27 ([172.27.25.27]:22).
+debug1: Remote connections from LOCALHOST:53012 forwarded to local address localhost:53012
+debug3: send packet: type 80
+debug1: Remote connections from LOCALHOST:53012 forwarded to local address 127.0.0.1:53012
+debug3: send packet: type 80
+debug1: channel 0: new [client-session]
+debug3: ssh_session2_open: channel_new: 0
+debug2: channel 0: send open
+debug3: send packet: type 90
+debug1: Requesting no-more-sessions@openssh.com
+debug3: send packet: type 80
+debug1: Entering interactive session.
+debug1: pledge: network
+debug3: receive packet: type 81
+debug1: remote forward success for: listen 53012, connect localhost:53012
+debug3: receive packet: type 82
+debug1: remote forward failure for: listen 53012, connect 127.0.0.1:53012
+Warning: remote port forwarding failed for listen port 53012
+debug1: All remote forwarding requests processed
+debug3: receive packet: type 91
+debug2: channel_input_open_confirmation: channel 0: callback start
+debug2: fd 5 setting TCP_NODELAY
+debug3: ssh_packet_set_tos: set IP_TOS 0x10
+debug2: client_session2_setup: id 0
+debug2: channel 0: request pty-req confirm 1
+debug3: send packet: type 98
+debug1: Sending environment.
+debug3: Ignored env TERM_PROGRAM
+debug3: Ignored env SHELL
+debug3: Ignored env TERM
+debug3: Ignored env TMPDIR
+debug3: Ignored env Apple_PubSub_Socket_Render
+debug3: Ignored env TERM_PROGRAM_VERSION
+debug3: Ignored env TERM_SESSION_ID
+debug3: Ignored env USER
+debug3: Ignored env SSH_AUTH_SOCK
+debug3: Ignored env PATH
+debug3: Ignored env PWD
+debug3: Ignored env XPC_FLAGS
+debug3: Ignored env XPC_SERVICE_NAME
+debug3: Ignored env SHLVL
+debug3: Ignored env HOME
+debug3: Ignored env LOGNAME
+debug1: Sending env LC_CTYPE = UTF-8
+debug2: channel 0: request env confirm 0
+debug3: send packet: type 98
+debug3: Ignored env DISPLAY
+debug3: Ignored env _
+debug3: Ignored env __CF_USER_TEXT_ENCODING
+debug2: channel 0: request shell confirm 1
+debug3: send packet: type 98
+debug2: channel_input_open_confirmation: channel 0: callback done
+debug2: channel 0: open confirm rwindow 0 rmax 32768
+debug3: receive packet: type 99
+debug2: channel_input_status_confirm: type 99 id 0
+debug2: PTY allocation request accepted on channel 0
+debug2: channel 0: rcvd adjust 2097152
+debug3: receive packet: type 99
+debug2: channel_input_status_confirm: type 99 id 0
+debug2: shell request accepted on channel 0
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Mon Jul  2 21:10:56 2018 from 172.25.2.121
+clecaros@mim-development:~$ cd public_html
+clecaros@mim-development:~/public_html$ rsub 1.txt
+debug3: receive packet: type 90
+debug1: client_input_channel_open: ctype forwarded-tcpip rchan 3 win 2097152 max 32768
+debug1: client_request_forwarded_tcpip: listen localhost port 53012, originator ::1 port 50728
+debug2: fd 11 setting O_NONBLOCK
+debug2: fd 11 setting TCP_NODELAY
+debug1: connect_next: host localhost ([127.0.0.1]:53012) in progress, fd=11
+debug3: fd 11 is O_NONBLOCK
+debug3: fd 11 is O_NONBLOCK
+debug1: channel 1: new [::1]
+debug1: confirm forwarded-tcpip
+debug3: channel 1: waiting for connection
+debug1: channel 1: connection failed: Connection refused
+debug2: fd 12 setting O_NONBLOCK
+debug2: fd 12 setting TCP_NODELAY
+setsockopt TCP_NODELAY: Invalid argument
+debug1: connect_next: host localhost ([::1]:53012) in progress, fd=12
+debug3: channel 1: waiting for connection
+debug1: channel 1: connection failed: Connection refused
+connect_to localhost port 53012: failed.
+debug3: send packet: type 92
+debug2: channel 1: zombie
+debug2: channel 1: garbage collecting
+debug1: channel 1: free: ::1, nchannels 2
+debug3: channel 1: status: The following connections are open:
+  #0 client-session (t4 r2 i0/0 o0/0 fd 6/7 cc -1)
+
+clecaros@mim-development:~/public_html$ 
