@@ -1,0 +1,384 @@
+---
+title: "Informe SDYST 1: Self Organizing Maps (SOM)/ Hierarchical Clustering (HC) en MNIST"
+author: "Cristóbal Lecaros, Felipe Miranda"
+date: "6/26/2019"
+bibliography: biblio.bib
+output: 
+  pdf_document:
+    latex_engine: xelatex
+toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = T, cache = T, out.width = "80%", fig.asp = 0.618, fig.show = "hold")
+library(tidyverse)
+library(kohonen)
+library(clusterSim)
+library(kableExtra)
+library(stats)
+library(caret)
+train <- readRDS("data/MNIST_train.RDS")
+```
+
+# Introducción
+
+Self Organizing Maps (SOM) es un algoritmo de clasificación no supervisado inventado por Teuvo Kohonen en la década de los ochenta que está basado en la idea de que el cerebro procesa estímulos sensoriales que tienen un espacio de entrada multidimensional que se reduce a ciertas regiones topógraficas de la corteza neuronal [@kohonen_self-organizing_1990]. Sus aplicaciones son variadas y entre ellas están el reconocimiento de patrones estadísticos en discursos, el control de brazos robóticos, compresión de imágenes, clasificación de cantos de apareamiento de insectos, etc. Es un método interesante porque permite visualizar en dos dimensiones las relaciones que tienen datos compuestos por variables de muchas dimensiones y que no son obvias a la inspección humana.
+
+El objetivo de este trabajo es replicar la metodología utilizada en [@palamara_self-organizing_2011], utilizando la base MNIST [@lecun_mnist_nodate] para comparar el resultado de clusterización de dos métodologías:  
+- SOM + K-means  
+- Clustering Jerárquico  
+
+Utilizando las etiquetas de cada imagen, se analizará el performance de clusterización con una métrica de accuracy del tipo "Caso Correcto / Casos totales".
+
+
+# Métodos
+
+## 1. Base de datos. MNIST
+
+La base de datos MNIST está compuesta por digitos escritos a mano. Tiene un conjunto de entrenamiento de 60,000 ejemplos, y un conjunto de prueba de 10,000 ejemplos. Es un subconjunto de un set mayor proveniente de NIST. Los digitos fueron normalizados por tamaño y centrados en una tamaño fijo de imagen. Los 60,000 patrones del conjunto de entramiento contienen ejemplos de aproximadamente 250 escritores.
+
+### Descarga y lectura de datos
+El análisis fue realizado en `R version 3.5.2`. Para cargar los datos de MNIST, utilizamos el código de @dalpiaz_load_nodate disponible [aquí](https://gist.github.com/daviddalpiaz/ae62ae5ccd0bada4b9acd6dbc9008706).
+
+
+
+## 2. Algoritmo SOM
+
+### 2.1. Conceptos y definiciones
+
+Self-Organizing Maps es una red neuronal competitiva que proyecta vectores que provienen de un espacio de altas dimensiones a un mapa de dos dimensiones. El algoritmo de proyección está diseñado para preservar las relaciones de distancia entre los datos de entrada de la manera más fidedigna posible. En nuestro caso, SOM proyecta las _muestras de 28x28-dimensiones del data set_ hacia las unidades, también llamadas _vectores prototipos_, de una red cuadrada.
+
+La red de SOM está compuesta por $M = m_1 \times m_2$ neuronas, o
+_unidades_. Cada unidad está asociada con dos tipos de información: (1)
+la posición de la unidad en la red; (2) un vector N-dimensional
+$w_i \space (i = 1, . . . , M)$, llamado _vector prototipo_, donde $N$ es la dimensión del espacio de los vectores de entrada. Por lo tanto, en este caso el término unidad se refiere tanto a los elementos de la red como a los vectores prototipos asociados. El conjunto de vectores prototipo también es llamado _codebook_ del SOM.
+
+Mapear datos para entrenar un SOM significa calcular la distancia de los nuevos puntos de datos o muestras a los vectores prototipos o codebook, y asignar cada objeto a la unidad con el vector prototipo más similar (la _unidad ganadora_ o "best matching unit").
+
+Para realizar el análisis nosotros utilizamos el paquete `kohonen` que se encuentra ampliamente documentado [@wehrens_flexible_2018]. 
+
+### 2.2 Funcion vecindario
+
+Lo diferente que tiene SOM con otros algoritmos adaptivos es que utiliza una _función vecindario_ gaussiana que se define como:  
+$$h_{c(i)}(t)=e^{\frac{-\left|r_{c(i)}-r_{i}\right|^{2}}{2 \sigma(t)^{2}}}$$
+
+donde $r_c(i)$ y $r_i$ son las posiciones en el mapa de la unidad ganadora y la unidad genérica $i$, respectivamente; $\sigma(t)$ es el radio a la iteración $t$ y corresponde a la amplitud de la función vecindario en el tiempo $t$. 
+
+### 2.3 Algoritmo de actualización: Batch 
+
+El algoritmo de entrenamiento usado fue el usado de manera standard y se conoce como _batch_. Consiste en comparar los objetos de entrenamiento con el conjunto de vectores prototipo. El vector prototipo de la unidad ganadora, al igual que las unidades del vecindario se modifican y se vuelven más similares al objeto que mapearon. Durante el entrenamiento, el radio decrece lentamente; al final del proceso solo las unidades ganadoras son actualizadas. La regla de aprendizaje y actualización se define como:
+
+$$w_{i}(t+1)=\frac{\sum_{i=1}^{S} h_{c(i)}(t) \cdot x_{j}}{\sum_{i=1}^{S} h_{c(i)}(t)}$$
+
+donde $w_{i}(t+1)$ es el peso del vector actualizado; $x_j$ es la muestra de entrada; $h_{c(i)}(t)$ es la función vecindario descrita anteriormente; $S$ es el número de muestras de entrada. 
+
+### 2.4 Distancia entre vectores prototipo
+
+En el trabajo de [@palamara_self-organizing_2011], utilizaron datos catégoricos que definían diferentes causas o mecanismos de accidentes laborales. En este caso, todas las variables de entrada vienen del mismo espacio vectorial que tiene valores númericos que van desde 0 a 255, por lo que no fue necesario usar la distancia de Hamming y este espacio fue tratado de manera continua. Usamos la distancia _suma de cuadrados_.  La distancia _suma de cuadrados_ utilizada en un mapa con una única capa es equivalente a una distancia Euclidiana, pero más rápida de computar porque no requiere calcular la raíz cuadrada. Esta distancia se define matemáticamente como:
+
+$$d^{2}(\mathbf{p}, \mathbf{q})=\left(p_{1}-q_{1}\right)^{2}+\left(p_{2}-q_{2}\right)^{2}+\cdots+\left(p_{i}-q_{i}\right)^{2}+\cdots+\left(p_{n}-q_{n}\right)^{2}$$
+
+
+### 2.5 Tamaño del mapa
+
+No existen métodos teóricos para determinar el tamaño de un mapa. Una regla general [@palamara_self-organizing_2011] sugiere usar la fórmula $5*\sqrt S$, donde $S$ es el número de muestras para entrenar. Nosotros probamos con esta regla, pero los mejores resultados dieron ocupando la máxima cantidad de unidades posibles permitidas por la implementación del algoritmo.
+
+
+## 3. Algoritmo K-means
+
+Una vez realizado el entrenamiento de SOM, el mapa fue divido en un número de areas finito. Este segundo nivel de clustering fue realizado utilizado el algoritmo _k-means_, visto en clases. 
+
+
+### 3.1 Índice Davies & Bouldin
+
+Para saber cuántos cluster debian hacerse en la base de datos de accidentes laborales, [@palamara_self-organizing_2011] cuantificaron el rendimiento de los cluster usando el _Índice Davies & Bouldin_. Este índice está definido matemáticamente como:
+
+$$D B=\frac{1}{n} \sum_{i=1}^{n} \max _{i \neq j}\left\{\frac{S_{n}\left(Q_{i}\right)+S_{n}\left(Q_{j}\right)}{S_{n}\left(Q_{i}, Q_{j}\right)}\right\}$$
+
+donde $n$ es el número de clusters, $Q_i$ es el cluster $i$; $S(Q_i)$ es la distancia promedio de todos los elementos del cluser con respecto a su centro; $S(Q_i, \space Q_j)$ es la distancia entre los centros de los cluster. En nuestro caso calculamos el índice para los primeros 10 cluster, ya que sabemos a priori que los datos pertenecen a 10 clases.
+
+---
+
+
+# Resultados
+
+
+Para realizar nuestros análisis, utilizamos una submuestra del dataset de muestras de entrenamiento. Utilizamos 1,000 muestras provenientes del data set de entrenamiento.
+
+```{r}
+set.seed(1)
+n_muestra <- 1000
+muestra <- train[sample(1:nrow(train), n_muestra,
+                        replace=FALSE),]
+
+X <- as.matrix(muestra[,-785])
+Y <- muestra[,785]
+```
+
+Una vez cargados los datos y realizada la submuestra, revisamos que los datos estuvieran correctamente etiquetados y que las imagenes correspondieran a su clase. Un ejemplo de esto puede verse en la imagen a continuación, donde se observa que la imagen se corresponde con su valor en la columna de etiqueta.  
+
+
+```{r fig.asp= 1, out.width="40%"}
+show_digit = function(arr784, col = gray(12:1 / 12), ...) {
+  image(matrix(as.matrix(arr784[-785]), nrow = 28)[, 28:1], col = col, ...)
+}
+
+show_digit(muestra[50, ])
+muestra[50, 785]
+```
+
+
+## SOM
+
+### Función `som`
+
+La función SOM utilizando el paquete `kohonen` tiene la siguiente forma: 
+```{r eval = F, echo = T}
+som_grid <- somgrid(xdim = val_grid, ydim= val_grid, topo="hexagonal",
+                    neighbourhood.fct = "gaussian")
+
+som_model_batch <- som(X,
+                       grid = som_grid,
+                       mode ="pbatch")
+```
+
+donde, como se observa, primero es necesario definir los parámetros de la red: `xdim` e `ydim` corresponden a las dimensiones, `topo`es la topología y `neighbourhood.fct` a la función vecindario. El modelo toma los datos `X`, y realiza el entrenamiento con el algoritmo batch, definido como `pbatch`, que significa parallel batch.
+Puede leerse un resumen de las características del modelo a continuación
+
+```{r echo = F}
+modelo1 <- readRDS("data/model_1000_13x13.RDS")
+```
+
+```{r}
+summary(modelo1)
+```
+
+### Ajuste del modelo
+
+Podemos observar que la distancia de los vectores prototipo con los valores de la muestra caen y se ajustan a medida que se entrena el agoritmo.
+
+```{r echo = F}
+plot(modelo1, type = "changes")
+```
+
+Una vez ajustado el modelo, podemos revisar cual es la disposición general de cada muestra en la red, mediante el siguiente gráfico
+
+```{r echo = F}
+plot(modelo1, type = "mapping", pchs = 20, main = "Mapeo Digitos a SOM", shape="straight",
+     border ="gray")
+```
+
+
+### Número óptimo de unidades
+
+Como se comentó en la sección métodos, no existe una forma teórica de determinar la mejor cantidad de unidades de la red, por lo que se ocupa una fórmula general como se expresa a continuación.
+```{r}
+val_grid <- sqrt(n_muestra)*5
+val_grid <- round(sqrt(val_grid))
+```
+
+Sin embargo, al analizar la red aumentando el número de unidades, se observa que la capacidad de discriminar entre los digitos aumenta, como puede verse comparando las siguientes imágenes.
+
+```{r out.width="50%", fig.align="default", echo = F}
+modelo2 <- readRDS("data/model_1000_31x31.RDS")
+
+plot(modelo1, type = "mapping", pchs = 21, col = as.integer(Y),
+     bgcol = "white", bg = as.integer(Y), #labels = Y,
+     border = "gray", shape = "straight", main = "")
+
+
+plot(modelo2, type = "mapping", pchs = 21, col = as.integer(Y),
+     bgcol = "white", bg = as.integer(Y), #labels = Y,
+     border = "gray", shape = "straight" , main = "")
+```
+
+Es por esta razón que trabajamos finalmente con una red de 31x31 unidades. 
+
+### Análisis exploratorio y evaluación de distancia
+
+Al hacer un análisis exploratorio de la red, podemos observar que hay algunos digitos que son bien identificados, mientras otros por su semejanza entre ellos caen en regiones del mapa similares. Es llamativo también constatar que existe una vecindad morfológica más general aún, y como es esperable, los números que se parecen entre sí están más cerca (a pesar de estar en regiones separables) que los que tienen forma diferente. Por ejemplo, el digito 1 está cerca del digito 7 en la región superior; el digito 4 (celeste) está cerca de la región donde se encuentra el digito 9; y la región de digito 8 (negro) colinda con la región de digito 6 (amarillo) y esta a su vez con la región de digito 0 (negro).
+
+```{r out.width= "100%"}
+plot(modelo2, type = "mapping", 
+     labels = Y, col = as.integer(Y),
+     border = "gray", shape = "straight" , main = "")
+```
+
+En el trabajo de [@palamara_self-organizing_2011], ellos utilizaron el mapa de distancias para distinguir regiones independientes. En nuestro caso, el mapa de distancia entre los vectores prototipos no permite distinguir con claridad clusters.
+
+```{r}
+plot(modelo2, type="dist.neighbours", main = "Distancias vectores prototipo",
+     shape="straight",
+     border ="gray")
+```
+
+---
+
+## Clusters
+
+### Índice DB
+
+El paso siguiente es realizar una segunda clusterización sobre los vectores prototipo del SOM.
+Para determinar la cantidad de cluster óptima, se utilizó el índice DB, como se mencionó en los métodos. La siguiente tabla muestra los valores para los cluster, siendo el mejor valor 9. Dado que conocemos que son 10 digitos, trabajamos con 10 cluster de todas formas.
+
+```{r echo = F}
+codebook <- getCodes(modelo2)
+output <- matrix(ncol=2, nrow=10)
+
+for(i in 2:10){
+  n_cluster <- i
+  kmeans <- kmeans(codebook, i)
+  indiceDB <- index.DB(codebook, kmeans$cluster)[[1]]
+  output[i,] <- c(n_cluster, indiceDB)
+}
+
+colnames(output) <- c("Clusters", "Indice DB")
+output <- as_tibble(output[-1,])
+```
+
+```{r echo=F}
+kable(output, "latex", booktabs = T, linesep = "",
+      caption = "Índice DB según K-cluster") %>% kable_styling(latex_options = "HOLD_position")
+```
+
+
+
+### SOM con K-Means
+
+El siguiente gráfico presenta la red SOM con los cluster realizados por K-Means sobre los vectores prototipo.
+
+```{r out.width= "100%", echo = F}
+kmeans_modelo2 <- kmeans(getCodes(modelo2), 10)
+plot(modelo2, type = "mapping", 
+     col = as.integer(Y), labels = Y,
+     border = "gray", shape = "straight", main = "")
+add.cluster.boundaries(modelo2, kmeans_modelo2$cluster)
+```
+
+Como puede observarse, en general la clusterización es de mala calidad, con excepción para los dígitos 8 y 6. Para cuantificar esto, se realizó el calculo de _Accuracy_ según la métrica propuesta por Palamara et al., como fue descrito en la introducción del trabajo. Consideramos clasificación correcta del grupo a la de la clase mayoritaria del cluster, y el denominador fueron los casos totales. La matriz de confusión para el algoritmo se presenta en la siguiente tabla.
+
+```{r echo = F}
+digito_grupo <- readRDS("data/digito_grupo.RDS")
+
+tabla <- matrix(nrow = 10, ncol = 10)
+
+for(i in 1:10) {
+  grupo <- filter(digito_grupo, grupo == i)
+  tabla_i <- table(grupo$value)
+  tabla[i,] <- tabla_i
+}
+
+colnames(tabla) <- c(as.character(0:9))
+rownames(tabla) <- paste("Cluster", 1:10)
+```
+
+```{r echo = F}
+kable(tabla, "latex", booktabs = T, linesep = "")%>%
+  kable_styling(latex_options = "HOLD_position")
+```
+
+
+### Accuracy SOM + K-Means
+
+Los valores de accuracy para cada cluster son presentados a continuación. El promedio de accuracy, ponderado por el numero de elementos en cada cluster, es 58.0%.
+
+```{r echo=F}
+acc <- tibble()
+for(i in 1:10){
+  acc[i,1] <- dimnames(tabla)[[1]][i]
+  acc[i,2] <- max(tabla[i,])/sum(tabla[i,]) }
+acc <- acc %>% rename( Acc = V2, Cluster = V1)
+```
+
+```{r echo=F}
+kable(acc, "latex", booktabs = T, linesep = "") %>% 
+kable_styling(latex_options = "HOLD_position")
+```
+
+---
+
+## Clustering Jerárquico
+
+### Construcción de Dendograma
+
+En el paper se hace una comparación entre la clusterización con SOM+Kmeans y la clusterización con Clustering Jerárquico (HC). Para el data set utilizado en este trabajo, se aplicó HC utilizando la librería `caret`. Se utilizó el criterio de linkage de Ward, tal como se hizo en el paper. El árbol fue separado en 10 clusters.
+
+```{r out.width= "100%", fig.asp=2}
+
+h_clusters <- hclust(dist(X), method = "ward.D")
+
+par(mfrow=c(3,1))
+
+plot(h_clusters, hang=-1, labels = Y, main = "Dendograma cortado en 10 branches")
+groups <- cutree(h_clusters, 10)
+rect.hclust(h_clusters,k=10)
+
+plot(cut(as.dendrogram(h_clusters), h=20000)$upper, main = "Arbol cortado en 10 branches")
+
+plot(cut(as.dendrogram(h_clusters), h=20000)$lower[[10]], main = "Ultimo branch")
+
+```
+
+El último dendograma corresponde al branch 10 del árbol original. Aunque las etiquetas de cada elemento no permiten visualizar los números en ese cluster (ya que corresponden al ID de cada elemento), la siguiente tabla enumera cada ocurrencia. A partir de los resultados, se deduce que el branch 10 corresponde al cluster del número 2.
+
+```{r echo=F}
+
+counts_last_branch <- table(Y[groups == 10])
+kable(counts_last_branch, "latex", booktabs = T, linesep = "") %>% 
+kable_styling(latex_options = "HOLD_position")
+```
+
+
+
+A continuación se observan los resultados de clusterización para cada branch. El mejor resultado se observa en los clusters 3, 6, 7, 8 y 10. Curiosamente, los clusters 3 y 8 contienen las imágenes de 1s. Se observa en la tabla que los numeros mejor clusterizados fueron 0, 1, 2 y 6.
+
+
+```{r echo=F}
+
+groups <- cutree(h_clusters, 10)
+groups <- factor(as.integer(groups-1))
+Y2 <- factor(Y)
+
+conf_hclust <- confusionMatrix(groups,Y2)
+conf_hclust_table <- conf_hclust$table
+rownames(conf_hclust_table) <- paste("Cluster", 1:10)
+
+kable(conf_hclust_table, "latex", booktabs = T, linesep = "") %>% 
+kable_styling(latex_options = "HOLD_position")
+
+
+```
+
+
+### Accuracy Clustering Jerárquico
+
+Los valores de accuracy para cada branch del HC son presentados a continuación. El promedio de accuracy ponderado por el número de elementos en cada branch es 62.5%. Este valor es superior al obtenido con el método de SOM + Kmeans.
+
+
+```{r echo=F}
+acc_hc <- tibble()
+for(i in 1:10){
+  acc_hc[i,1] <- dimnames(conf_hclust_table)[[1]][i]
+  acc_hc[i,2] <- max(conf_hclust_table[i,])/sum(conf_hclust_table[i,]) }
+acc_hc <- acc_hc %>% rename( Acc = V2, Cluster = V1)
+```
+
+```{r echo=F}
+kable(acc_hc, "latex", booktabs = T, linesep = "") %>% 
+kable_styling(latex_options = "HOLD_position")
+```
+
+```{r echo=F, results="hide"}
+weighted.mean(acc_hc$Acc, rowSums(conf_hclust_table))  
+```
+
+# Conclusiones
+
+En el caso de [@palamara_self-organizing_2011], el método de clusterización SOM + Kmeans generó mejores resultados que el método de Clustering Jerárquico. En este trabajo, sin embargo, los resultados obtenidos sugieren lo contrario. Esto puede deberse a las diferencias que existen entre los data sets de cada trabajo. El data set de accidentes laborales está descrito por 48 variables binarias, y los autores señalan que aplicar SOM antes de clusterizar puede ser útil para variables categóricas pues permite capturar relaciones entre elementos en un espacio continuo. En el caso de MNIST, las variables son numéricas, por lo que esa ventaja no aplicaría. 
+
+Otro factor que puede influir en los resultados es el número de variables de cada elemento. Los modelos fueron alimentados directamente con el valor de cada pixel de las imágenes para un total de 784 variables (28x28px), a diferencia de las 48 variables de la base de accidentes. Adicionalmente, se ha visto en clases que los modelos de clasificación y/o clusterización de imágenes pueden ser muy sensibles a la posición de los objetos de interés dentro de la misma imagen. Aunque esto debería afectar ambas metodologías, es posible que al aplicar Kmeans sobre los vectores prototipos de SOM se esté construyendo sobre el error del método inicial. El error de SOM también puede ser mayor por el hecho de que cada vector prototipo arrastra a sus vecinos en cada iteración.
+
+Como trabajo futuro, se propone pre-procesar las imágenes antes de incorporarlas a los modelos de clusterización. El objetivo es reducir el error asociado al uso de los pixeles crudos. Se plantean como alternativas la extracción de componentes principales, o la convolución de imágenes para identificar patrones relevantes.
+
+
+# Bibliografía
