@@ -1,0 +1,210 @@
+---
+output: 
+  pdf_document:
+    citation_package: biblatex
+    keep_tex: false
+    fig_caption: true
+    latex_engine: xelatex
+    toc: false
+    template: /Library/Frameworks/R.framework/Versions/3.5/Resources/library/rticles/rmarkdown/templates/svm_template/resources/template.tex
+
+title: "Reflexiones acerca del modelo de Regresión Lineal"
+header-includes:
+  - \usepackage[spanish]{babel}
+  - \usepackage{mathtools}
+
+
+author:
+- name: Cristóbal Lecaros C.
+  affiliation: CIMT, Universidad de Chile
+abstract: "El siguiente trabajo examina los métodos de estimación de los paramétros del modelo de regresión lineal y expone algunos instrumentos matemáticos que se implementan en él para permitir trabajar con residuos heterocedásticos y observaciones correlacionadas."
+keywords: "Regresión lineal, Mínimos Cuadrados, Máxima Verosimilitud, Función varianza, Estructura de correlación"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+geometry: margin=1in
+fontfamily: mathpazo
+fontsize: 11pt
+# spacing: double
+bibliography: /Users/cristoballecaros/Desktop/mae2.bib
+---
+
+
+# Introducción
+
+El siguiente ensayo quiere presentar algunas consideraciones sobre aspectos teóricos del modelo de regresión lineal. Mi intención es desarrollar algunos conceptos que aparecen cuando se estudia el modelo y que sirven como base para la implementación de otro modelo estadístico que es el modelo lineal con efectos mixtos. 
+La mayoría de la teoría de este trabajo proviene de las ideas expuestas en @galecki_linear_2013, aunque también hay ideas importantes que se encuentran en Strang [@strang_introduction_2016;  @strang_matrix_2018], en conjunto con lo visto en clases por Felipe Tobar ( [link](https://github.com/GAMES-UChile/Curso-Aprendizaje-de-Maquinas)).
+En la parte inicial se expondrá el modelo en su forma general y cómo la estimación de los coeficientes tiene varias metodologías (e.g., el método de mínimos cuadrados que toma la forma de una matriz de proyección; el método de máxima verosimilitud que asume un error $\varepsilon$ que se distribuye normalmente), que bajo ciertas condiciones llegan al mismo resultado. Luego, se revisará cómo se introducen dos objetos matemáticos al modelo, que permiten darle flexibilidad para trabajar con datos heterocedásticos y con observaciones correlacionadas.
+
+## Definición
+
+Como hemos visto en clases, el modelo se describe, para el nivel individual de cada dato u observación como:  
+
+\begin{equation}
+  y_{i}=x_{i}^{(1)} \beta_{1}+\ldots+x_{i}^{(p)}\beta_{p}+\varepsilon_{i}
+\end{equation}
+
+
+La fórmula para escribir todas las observaciones del modelo de una manera matricial es:  
+
+$$
+\mathbf{y} \equiv\left(\begin{array}{c}{y_{1}} \\ {\vdots} \\ {y_{n}}\end{array}\right), \boldsymbol{\varepsilon} \equiv\left(\begin{array}{c}{\varepsilon_{1}} \\ {\vdots} \\ {\varepsilon_{n}}\end{array}\right)
+$$
+
+$$
+X= \left(\begin{array}{cccc}{x_{1}^{(1)}} & {x_{1}^{(2)}} & {\ldots} & {x_{1}^{(p)}} \\ {\vdots} & {\vdots} & {\ddots} & {\vdots} \\ {x_{n}^{(1)}} & {x_{n}^{(2)}} & {\dots} & {x_{n}^{(p)}}\end{array}\right)
+$$
+
+
+\begin{equation}
+\mathbf{y}=X \boldsymbol{\beta}+\boldsymbol{\varepsilon}
+\end{equation}
+
+
+Siendo $\varepsilon \sim {\mathcal N}(0, \boldsymbol{\sigma})$.  
+
+Nos interesa estimar $\boldsymbol{\beta}$ de la mejor forma posible.
+
+
+# Mínimos Cuadrados 
+
+El método de mínimos cuadrados puede entenderse como la estrategia para encontrar la mejor solución cuando $Ax=b$ _no tiene solución_, es decir, cuando las filas son más que las columnas de la matriz $A$ ($m>n$), o cuando las columnas de $A$ no son independientes. Por lo tanto, si se quiere estimar el mejor $\hat{x}$, tal que $A\hat{x}=b$  
+$$A\hat{x}=b \quad / A^T$$
+$$A^TA\hat{x}=A^Tb \quad / (A^TA)^{-1}$$
+$$\hat{x}= (A^TA)^{-1}A^Tb$$
+
+
+De forma similar, se puede llegar a la interpretación geométrica si se entiende el problema como la proyección del vector $b$ que se encuentra fuera del espacio vectorial de las columnas ($C(A)$), utilizando la matriz Proyección $P = A(A^TA)^{-1}A^Tb$, que tiene las propiedades $P=P^T=P^2$.
+El problema de encontrar el mínimo error $e=b-Ax$ se logra mediante la derivación de la funcion $\Vert {Ax-b}\Vert^2_2$ en el punto en que esta derivada parcial (proveniente de una función cuadrada) es cero. Esta función costo tiene la forma  
+
+$$J=\frac{1}{2} \sum_{i=1}^{n}\left(y_{i}-a \mathbf{x}_{i}-b\right)^{2}$$
+ y su optimización para un modelo $y=ax +b$ es
+ 
+ $$a^{*}, b^{*}=\underset{a, b}{\arg \min } \frac{1}{2} \sum_{i=1}^{n}\left(y_{i}-a \mathbf{x}_{i}-b\right)^{2}$$
+
+Puede verse entonces que la estimación de los coeficientes $\beta$ de (2) tiene la siguiente forma, que es la forma mencionada anteriormente para $\hat{x}$:
+
+$$
+\widehat{\boldsymbol{\beta}} \equiv\left(\sum_{i=1}^{n} \mathbf{x}_{i} \mathbf{x}_{i}^{T}\right)^{-1} \sum_{i=1}^{n} \mathbf{x}_{i} y_{i}=\left(\boldsymbol{X}^{T} \boldsymbol{X}\right)^{-1} \boldsymbol{X}^{T} \mathbf{y}
+$$
+
+# Máxima verosimilitud
+
+Una forma interesante de estimar los coeficientes es mediante un enfoque probabilístico. Si se asumen observaciones _independientes_ identicamente distribuidas, la estimacion de $\beta$ puede entenderse como un productorio de múltiples probabilidades. La función likelihood sobre el conjunto de datos se denota como:
+
+$$
+L\left(\beta, \sigma^{2} ; \mathbf{y}\right) \equiv\left(2 \pi \sigma^{2}\right)^{-n / 2} \prod_{i=1}^{n} \exp \left[-\frac{\left(y_{i}-\mathbf{x}_{i}^{T} \boldsymbol{\beta}\right)^{2}}{2 \sigma^{2}}\right]
+$$
+
+Como vimos en clase, $\operatorname{max} p(Y | X, \mathbf{w}, \sigma)=\min -\log p(Y | X, \mathbf{w}, \sigma)$, por lo que la estimación puede denotarse como:
+
+$$
+\ell\left(\beta, \sigma^{2} ; \mathbf{y}\right) \equiv-\frac{n}{2} \log \left(\sigma^{2}\right)-\frac{1}{2 \sigma^{2}} \sum_{i=1}^{n}\left(y_{i}-\mathbf{x}_{i}^{T} \boldsymbol{\beta}\right)^{2}
+$$
+
+Que tiene la misma solución que el método ordinario de mínimos cuadrados.
+
+# Función varianza 
+
+
+## Definición
+
+Para permitir al modelo trabajar sin la restricción de homocedasticidad, se puede entender el problema mediante una abstracción ingeniosa en que se asume que $\sigma$ es un escalar e introducir una función varianza $\lambda(\cdot)$, que permita modificar la varianza entre las observaciones.
+
+De ese modo, el modelo queda definido como:
+$$
+{y_{i}=x_{i}^{(1)} \beta_{1}+\cdots+x_{i}^{(p)} \beta_{p}+\varepsilon_{i} \equiv \mathbf{x}_{i}^{\prime} \boldsymbol{\beta}+\varepsilon_{i}}
+$$
+  siendo 
+
+$${\varepsilon_{i} \sim \mathcal{N}\left(0, \sigma_{i}^{2}\right)}$$
+$$
+\sigma_{i}^{2}=\sigma^{2} \lambda_{i}^{2}
+$$
+
+y por lo tanto: 
+$$
+\operatorname{Var}\left(\varepsilon_{i}\right)=\sigma^{2} \lambda^{2}\left(\boldsymbol{\delta}, \mu_{i} ; \mathbf{v}_{i}\right)
+$$
+
+$\lambda(\cdot)$ tiene tres parámetros: $\delta$, $\mu$ y $\mathbf{v}$; asume valores positivos, es continua y diferenciable con respecto al parámetro $\delta$. 
+Es importante notar que el modelo definido así tiene $n+p$ parámetros, incluyendo _n_ parámetros $\sigma_i$ y _p_ parámetros $\beta$. Esto es más que _n_, el número de observaciones. Esto hace que el modelo se vuelva no identificable[^identificabilidad]. Para solucionar esto, se deben imponer restricciones adicionales a la función varianza que operen sobre los residuos.  
+
+[^identificabilidad]: Una definción de identificabilidad que se encuentra en wikipedia [@noauthor_identifiability_2019] es la siguiente: Sea $\mathcal{P}=\left\{P_{\theta} : \theta \in \Theta\right\}$ un modelo estadístico con el espacio de parámetros $\Theta$. $\mathcal{P}$ es identificable si el mapeo $\theta \mapsto P_{\theta }$ es uno-a-uno: $P_{\theta_{1}}=P_{\theta_{2}} \quad \Rightarrow \quad \theta_{1}=\theta_{2}  \quad \textrm{para todo} \quad \theta_{1}, \theta_{2} \in \Theta$.
+
+
+&nbsp;
+
+## Tipos de función varianza
+
+La función varianza $\lambda(\cdot)$ puede ser clasificada en cuatro grupos:  
+
+1. Pesos conocidos, $\lambda(\cdot) = \lambda(\mathbf{v})$
+2. Funciones varianza que dependen en $\delta$ pero no en $\mu$, $\lambda(\cdot) = \lambda(\delta; \mathbf{v})$ 
+3. Funciones varianza que dependen en $\delta$ y $\mu$, $\lambda(\cdot) = \lambda(\delta;\mu; \mathbf{v})$ 
+4. Funciones varianza que dependen en $\mu$ pero no en $\delta$, $\lambda(\cdot) = \lambda(\mu; \mathbf{v})$ 
+
+La clasificación tiene implicancias importantes en términos de los métodos de estimación y sus resultados. Por ejemplo, para funciones varianza que no dependen de $\mu$, la distribución del estadístico proveniente del F-test es solo aproximada.
+
+## Fórmula general
+
+Si uno quisiera escribir la función varianza para todas las observaciones, el modelo debe ser especificado de la siguiente manera:
+
+$$
+\boldsymbol{R} \equiv \boldsymbol{\Lambda}\boldsymbol{\Lambda}
+$$
+$$
+\boldsymbol{\Lambda}=\operatorname{diag}\left(\lambda_{1}, \ldots, \lambda_{n}\right)
+$$
+
+
+$$
+\mathbf{y}=\boldsymbol{X} \boldsymbol{\beta}+\boldsymbol{\varepsilon}; \quad \boldsymbol{\varepsilon} \sim \mathcal{N}(\mathbf{0}, \mathcal{R}), \quad \mathcal{R}=\sigma^{2} \boldsymbol{R}
+$$
+
+
+# Estructura de correlación
+
+El supuesto fundamental del modelo de regresión lineal es que las observaciones son independientes entre sí. Este supuesto es restrictivo cuando se realizan experimentos que entregan datos correlacionados. Por ejemplo, datos que provienen de series de tiempo o en el que existen grupos o clusters dados por condiciones espaciales. Los modelos que relajan el supuesto de independencia se conocen como modelos de efectos fijos y errores residuales correlacionados para datos agrupados. Para conseguir esto, se debe introducir un objeto matemático sobre los modelos presentados anteriormente, y que se conoce como estructura de correlación.  
+Para datos con diferentes niveles de agrupamiento, tenemos _N_ grupos indexados por _i_ ($i= 1,...,N$) y $n_i$ observaciones por grupo indexadas por _j_ ($j=1,...,n_i$).  
+
+&nbsp;
+
+Sea el modelo
+
+$$
+\mathbf{y}_{i}=\boldsymbol{X}_{i} \boldsymbol{\beta}+\boldsymbol{\varepsilon}_{i}
+$$
+donde
+
+$$
+\mathbf{y}_{i} \equiv\left(\begin{array}{c}{y_{i 1}} \\ {\vdots} \\ {y_{i j}} \\ {\vdots} \\ {y_{i n_{i}}}\end{array}\right), \quad \boldsymbol{\varepsilon}_{i} \equiv\left(\begin{array}{c}{\varepsilon_{i 1}} \\ {\vdots} \\ {\varepsilon_{i j}} \\ {\vdots} \\ {\varepsilon_{i n_{i}}}\end{array}\right),
+$$
+&nbsp;
+
+$$
+\boldsymbol{X}_{i} \equiv\left(\begin{array}{cccc}{x_{i 1}^{(1)}} & {x_{i 1}^{(2)}} & {\dots} & {x_{i 1}^{(p)}} \\ {\vdots} & {\vdots} & {\ddots} & {\vdots} \\ {x_{i n_{i}}^{(1)}} & {x_{i n_{i}}^{(2)}} & {\cdots} & {x_{i n_{i}}^{(p)}}\end{array}\right)
+$$
+
+$$
+\varepsilon_{i} \sim \mathcal{N}_{n_{i}}\left(\mathbf{0}, \mathcal{R}_{i}\right)
+$$
+
+$$
+\mathcal{R}_{i}=\sigma^{2} \boldsymbol{R}_{i}.
+$$
+
+La estructura de correlación se introduce sobre la varianza de los residuos como una matriz de correlación $\boldsymbol{C_i}$, que permite la correlación entre las observaciones dentro del grupo _i_.
+$$
+\boldsymbol{R}_{i}=\boldsymbol{\Lambda}_{i} \boldsymbol{C}_{i} \boldsymbol{\Lambda}_{i}
+$$
+
+
+La estructura de correlación se especifica asumiendo que los coeficientes de correlación entre dos errores residuales, $\varepsilon_{ij}$ y $\varepsilon_{ij^\prime}$, que corresponden a dos observaciones del mismo grupo _i_, está dada por
+
+$$
+\operatorname{Corr}\left(\varepsilon_{i j}, \varepsilon_{i j^{\prime}}\right)=h\left[d\left(\mathbf{t}_{i j}, \mathbf{t}_{i j^\prime}\right), \boldsymbol{\varrho}\right]
+$$
+
+donde $\boldsymbol{\varrho}$ es un vector de parámetros de correlación, $d\left(\mathbf{t}_{i j}, \mathbf{t}_{i j}\right)$ es una función distancia de los vectores de posición $\mathbf{t}_{i j}$ y $\mathbf{t}_{i j^\prime}$ que corresponden con $\varepsilon_{ij}$ y $\varepsilon_{ij^\prime}$, respectivamente, y $h(\cdot,\cdot)$ es una función continua con respecto a $\varrho$, que toma valores entre -1 y 1, y donde $h(0,\varrho) \equiv 1$. Utilizando diferentes funciones de distancia y de correlación, se pueden obtener diferentes estructuras de correlación, que se clasifican generalmente en dos grupos: seriales y espaciales.
+
+\newpage
+# Referencias
